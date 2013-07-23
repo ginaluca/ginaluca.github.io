@@ -15,7 +15,10 @@ var raycaster;
 var mousepx = new THREE.Vector2();
 var possibleRotation;
 
-function init(containerId) {
+/**
+ * rendering can be 'canvas' or 'webgl'
+ **/
+function init(containerId, rendering) {
 
     windowSize = calcWindowSize();
     
@@ -27,15 +30,15 @@ function init(containerId) {
     raycaster = new THREE.Raycaster();
     
     scene = new THREE.Scene();
-    cube = createCube();
+    cube = createCube(rendering);
 	scene.add( cube);
-	// scene.add( mainBlock(200, new THREE.MeshLambertMaterial( { color: 0x5F5F5F, shading: THREE.SmoothShading })));
-    
-    scene.add(directionalLight(1, 2, 3, 1.0));
-    scene.add(directionalLight(-1, -2, -3, 0.5));
-    // scene.add(new THREE.AmbientLight(0x0a0a0a));
+
+    if (rendering == 'webgl') {
+        scene.add(directionalLight(1, 2, 3, 1.0));
+        scene.add(directionalLight(-1, -2, -3, 0.5));
+    }
 	
-	renderer = createRenderer(windowSize);
+	renderer = createRenderer(windowSize, rendering);
 
     container = document.createElement('div');
     document.body.appendChild(container);
@@ -57,8 +60,8 @@ function directionalLight(x, y, z, intensity) {
     return dl;
 }
 
-function createCube() {
-    return new Rubik('3x3x3'.value, 200, 0.3, buildCubelet);
+function createCube(rendering) {
+    return new Rubik('3x3x3'.value, 200, 0.3, rendering == 'webgl'? buildCubeletWegGL: buildCubeletCanvas);
 }
 
 function calcWindowSize() {
@@ -70,8 +73,8 @@ function calcWindowSize() {
     return size;    
 }
 
-function createRenderer(size) {
-	var renderer = new THREE.WebGLRenderer({ antialias: true } );
+function createRenderer(size, rendering) {
+	var renderer = rendering == 'webgl'? new THREE.WebGLRenderer({ antialias: true } ): new THREE.CanvasRenderer();
     
     renderer.sortObjects = false;
     
