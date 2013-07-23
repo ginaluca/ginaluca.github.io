@@ -14,6 +14,7 @@ var projector;
 var raycaster;
 var mousepx = new THREE.Vector2();
 var possibleRotation;
+var light;
 
 /**
  * rendering can be 'canvas' or 'webgl'
@@ -34,8 +35,9 @@ function init(containerId, rendering) {
 	scene.add( cube);
 
     if (rendering == 'webgl') {
-        scene.add(directionalLight(1, 2, 3, 1.0));
-        scene.add(directionalLight(-1, -2, -3, 0.5));
+        light = directionalLight(0, 0, camera.position.z, 1.0);
+        scene.add(light);
+        // scene.add(directionalLight(-1, -2, -3, 0.5));
     }
 	
 	renderer = createRenderer(windowSize, rendering);
@@ -92,6 +94,10 @@ function animate() {
 	requestAnimationFrame( animate );
 
     cameraControls.update();
+    if (light) {
+        light.position = camera.position;
+    }
+    
     render();
 }
 
